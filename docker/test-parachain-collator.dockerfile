@@ -29,7 +29,7 @@ RUN cargo build --release -p rococo-collator
 #   --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/PEER_ID
 #
 # with the appropriate ip and ID for both Alice and Bob
-FROM debian:buster-slim as collator
+FROM debian:10.12-slim as collator
 RUN apt-get update && apt-get install jq curl bash -y && \
     curl -sSo /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
     chmod +x /wait-for-it.sh && \
@@ -48,13 +48,13 @@ HEALTHCHECK --interval=300s --timeout=75s --start-period=30s --retries=3 \
 # the runtime stage is normally built once, cached, and ignored, but can be
 # specified with the --target build flag. This just preserves one of the builder's
 # outputs, which can then be moved into a volume at runtime
-FROM debian:buster-slim as runtime
+FROM debian:10.12-slim as runtime
 COPY --from=builder \
     /paritytech/cumulus/target/release/wbuild/cumulus-test-parachain-runtime/cumulus_test_parachain_runtime.compact.wasm \
     /var/opt/
 CMD ["cp", "-v", "/var/opt/cumulus_test_parachain_runtime.compact.wasm", "/runtime/"]
 
-FROM debian:buster-slim
+FROM debian:10.12-slim
 COPY --from=builder \
     /paritytech/cumulus/target/release/rococo-collator /usr/bin
 
